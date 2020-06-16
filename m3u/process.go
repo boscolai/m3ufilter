@@ -2,13 +2,14 @@ package m3u
 
 import (
 	"bufio"
-	"github.com/PuerkitoBio/rehttp"
-	"github.com/hoshsadiq/m3ufilter/config"
-	"github.com/hoshsadiq/m3ufilter/logger"
 	"net/http"
 	"net/url"
 	"sort"
 	"time"
+
+	"github.com/PuerkitoBio/rehttp"
+	"github.com/hoshsadiq/m3ufilter/config"
+	"github.com/hoshsadiq/m3ufilter/logger"
 )
 
 var log = logger.Get()
@@ -58,7 +59,9 @@ func GetPlaylist(conf *config.Config) (streams Streams, allFailed bool) {
 		}
 	}
 
-	sort.Sort(streams)
+	if len(config.Get().Core.GroupOrder) > 0 {
+		sort.Sort(streams)
+	}
 
 	return streams, len(conf.Providers) == errors
 }
