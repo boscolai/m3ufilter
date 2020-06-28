@@ -59,9 +59,10 @@ func GetPlaylist(conf *config.Config) (streams Streams, allFailed bool) {
 		}
 	}
 
-	if len(config.Get().Core.GroupOrder) > 0 {
-		sort.Sort(streams)
-	}
+	//if len(config.Get().Core.GroupOrder) > 0 {
+	//	sort.Sort(streams)
+	//}
+	sort.Sort(streams)
 
 	return streams, len(conf.Providers) == errors
 }

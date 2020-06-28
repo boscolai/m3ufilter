@@ -6,10 +6,11 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"github.com/hoshsadiq/m3ufilter/config"
 	"io"
 	"strings"
 	"time"
+
+	"github.com/hoshsadiq/m3ufilter/config"
 )
 
 var groupOrder map[string]int
@@ -21,17 +22,16 @@ func (s Streams) Len() int {
 }
 
 func (s Streams) Less(i, j int) bool {
-	iOrder, ok := groupOrder[s[i].Group]
-	if !ok {
+	iOrder, iHasOrder := groupOrder[s[i].Group]
+	jOrder, jHasOrder := groupOrder[s[j].Group]
+
+	if iHasOrder && jHasOrder {
+		return jOrder < iOrder
+	} else if iHasOrder {
 		return true
 	}
 
-	jOrder, ok := groupOrder[s[j].Group]
-	if !ok {
-		return false
-	}
-
-	return iOrder < jOrder
+	return s[i].less(s[j])
 }
 
 func (s Streams) Swap(i, j int) {
@@ -57,6 +57,18 @@ type Stream struct {
 	Shift   string `yaml:"tvg-shift"`
 	Logo    string `yaml:"tvg-logo"`
 	Group   string `yaml:"group-title"`
+}
+
+func (s *Stream) less(other *Stream) bool {
+	sFields := []string{s.Group, s.ChNo, s.TvgName}
+	oFields := []string{other.Group, other.ChNo, other.TvgName}
+	for i, _ := range sFields {
+		if sFields[i] == oFields[i] {
+			continue
+		}
+		return sFields[i] < oFields[i]
+	}
+	return true
 }
 
 func decode(conf *config.Config, reader io.Reader, providerConfig *config.Provider) (Streams, error) {
