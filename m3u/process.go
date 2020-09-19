@@ -81,7 +81,7 @@ func NewClient(MaxRetryAttempts int) *http.Client {
 		rehttp.ConstDelay(time.Second),
 	)
 	return &http.Client{
-		Timeout:   time.Second * 10,
+		Timeout:   time.Second * 120,
 		Transport: tr,
 	}
 }
